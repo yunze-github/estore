@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.briup.app.estore.mapper.OrderMapper">
+  <resultMap id="BaseResultMap" type="com.briup.app.estore.bean.Order">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="cost" jdbcType="DOUBLE" property="cost" />
+    <result column="orderDate" jdbcType="DATE" property="orderdate" />
+    <association  property="customer" resultMap="CustomerResultMap"></association>
+  </resultMap>
+  <resultMap id="CustomerResultMap" type="com.briup.app.estore.bean.Customer">
+    <id column="cid" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="zip" jdbcType="VARCHAR" property="zip" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="telephone" jdbcType="VARCHAR" property="telephone" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tbl_order
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.briup.app.estore.bean.Order"  useGeneratedKeys="true" keyProperty="id">
+    insert into tbl_order (id, cost, orderDate, 
+      customer_id)
+    values (#{id,jdbcType=INTEGER}, #{cost,jdbcType=DOUBLE}, #{orderdate,jdbcType=DATE}, 
+      #{customer.id,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.briup.app.estore.bean.Order">
+    update tbl_order
+    set cost = #{cost,jdbcType=DOUBLE},
+      orderDate = #{orderdate,jdbcType=DATE},
+      customer_id = #{customer.id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id, cost, orderDate, customer_id
+    from tbl_order
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByCustomerId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    	o.id, cost, orderDate, customer_id,
+    	c.id as cid, name, password, zip, address, telephone, email
+    from 
+    	tbl_order o,tbl_customer c
+    where 
+    	o.customer_id = c.id
+    	and
+    	customer_id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, cost, orderDate, customer_id
+    from tbl_order
+  </select>
+</mapper>

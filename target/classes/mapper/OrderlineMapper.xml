@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.briup.app.estore.mapper.OrderlineMapper">
+
+  <resultMap id="BaseResultMap" type="com.briup.app.estore.bean.Orderline">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="num" jdbcType="INTEGER" property="num" />
+    <association property="order" resultMap="OrderResultMap"></association>
+    <association property="book" resultMap="BookResultMap"></association>
+  </resultMap>
+  <!-- 订单 -->
+  <resultMap id="OrderResultMap" type="com.briup.app.estore.bean.Order">
+    <id column="oid" jdbcType="INTEGER" property="id" />
+    <result column="cost" jdbcType="DOUBLE" property="cost" />
+    <result column="orderDate" jdbcType="DATE" property="orderdate" />
+    <association  property="customer" resultMap="CustomerResultMap"></association>
+  </resultMap>
+  <!-- 用户 -->
+  <resultMap id="CustomerResultMap" type="com.briup.app.estore.bean.Customer">
+    <id column="cid" jdbcType="INTEGER" property="id" />
+    <result column="cname" jdbcType="VARCHAR" property="name" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="zip" jdbcType="VARCHAR" property="zip" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="telephone" jdbcType="VARCHAR" property="telephone" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+  </resultMap>
+  <!-- 书籍 -->
+  <resultMap id="BookResultMap" type="com.briup.app.estore.bean.Book">
+    <id column="bid" jdbcType="INTEGER" property="id" />
+    <result column="bname" jdbcType="VARCHAR" property="name" />
+    <result column="price" jdbcType="DOUBLE" property="price" />
+  </resultMap>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tbl_orderline
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByOrderId" parameterType="java.lang.Integer">
+    delete from tbl_orderline
+    where order_id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.briup.app.estore.bean.Orderline"  useGeneratedKeys="true" keyProperty="id">
+    insert into tbl_orderline (id, num, order_id, 
+      book_id)
+    values (#{id,jdbcType=INTEGER}, #{num,jdbcType=INTEGER}, #{order.id,jdbcType=INTEGER}, 
+      #{book.id,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.briup.app.estore.bean.Orderline">
+    update tbl_orderline
+    set num = #{num,jdbcType=INTEGER},
+      order_id = #{order.id,jdbcType=INTEGER},
+      book_id = #{book.id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id, num, order_id, book_id
+    from tbl_orderline
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByOrderIdWithBook" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    	ol.id, ol.num, ol.order_id, ol.book_id,
+    	b.id as bid, b.name as bname, b.price,
+    	o.id as oid, o.cost, o.orderDate, o.customer_id
+    from 
+    	tbl_orderline ol,tbl_book b,tbl_order o
+    where 
+    	ol.order_id = o.id
+    	and
+    	ol.book_id = b.id
+    	and
+    	order_id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, num, order_id, book_id
+    from tbl_orderline
+  </select>
+</mapper>
